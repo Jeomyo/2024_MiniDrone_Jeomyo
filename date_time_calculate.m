@@ -9,3 +9,12 @@ function date_time = date_time_calculate (days)
        days(1,4) = mod(days(1,4), 24);
        days(1,3) = days(1,3) + k;
    end
+   
+   while 1
+   if (days(1,2)== 1 || days(1,2)== 3 || days(1,2)== 5 || days(1,2)== 7 || days(1,2)== 8 || days(1,2)== 10 || days(1,2)== 12)
+       if days(1,3) > 31
+           days(1,3) = days(1,3) - 31;
+           days(1,2) = days(1,2) + 1;
+       else
+           break;
+       end
