@@ -28,7 +28,11 @@ days(1,i) = value;
 end
 
 
-date_time = date_time_calculate (days); 
+date_time = date_time_calculate (days);
 
-disp(date_time);
+D = zeros(1,6);
+D = date_time;
 
+shift_date_time = datetime(D);
+
+fprintf("이동된 시간은 %s\n",shift_date_time);
