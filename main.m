@@ -1,5 +1,5 @@
 date = {'year', 'month', 'day', 'Hours', 'minutes', 'seconds'};
-days=zeros(1,4);
+days=zeros(1,6);
 
 for i=1:6
 
