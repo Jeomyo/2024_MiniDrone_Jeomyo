@@ -18,16 +18,36 @@ bw2 = imfill(green, 'holes');
 % 구멍을 채우기 전후를 비교하여 값이 일정하면 0, 변했으면 1로 변환
 bw2 = bw2 & ~green;
 
-% 가장 큰 객체만 선택
-stats = regionprops('table', bw2, 'Centroid', 'Area');
-[~, maxIdx] = max(stats.Area);
-centroid = stats.Centroid(maxIdx, :);
+% 작은 객체 제거
+bw2 = bwareaopen(bw2, 1000); % 1000 픽셀 이하의 객체 제거
+
+% 컨투어 검출
+[B, L] = bwboundaries(bw2, 'noholes');
+
+% 가장 큰 객체 선택
+stats = regionprops(L, 'Area', 'Centroid');
+[~, maxIdx] = max([stats.Area]);
+largestBoundary = B{maxIdx};
+
+% Convex Hull을 사용하여 다각형 근사화
+k = convhull(largestBoundary(:, 2), largestBoundary(:, 1));
+approxPoly = largestBoundary(k, :);
+
+% 근사 다각형의 중심점 계산
+minX = min(approxPoly(:, 2));
+maxX = max(approxPoly(:, 2));
+minY = min(approxPoly(:, 1));
+maxY = max(approxPoly(:, 1));
+centroidX = (minX + maxX) / 2;
+centroidY = (minY + maxY) / 2;
+centroid = [centroidX, centroidY];
 
 % 결과 출력
 figure;
 imshow(img);
 hold on;
-plot(centroid(1), centroid(2), 'r*', 'MarkerSize', 15); 
+plot(approxPoly(:, 2), approxPoly(:, 1), 'g-', 'LineWidth', 1); % 근사 다각형 그리기
+plot(centroid(1), centroid(2), 'r*', 'MarkerSize', 10); % 중심점 그리기
 title('Detected Shape and Its Centroid');
 hold off;
 
