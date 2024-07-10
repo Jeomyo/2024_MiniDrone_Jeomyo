@@ -444,8 +444,12 @@ distance = exp(-0.471769 * log(sum(purple (:))) + log(64.104421));
 
 ### 5-1. DetectionRed 
 
+먼저 입력 인자로 받은 cam을 통해 snapshot을 하여 이미지를 얻은 후, 이미지를 각각 R차원, G차원, B차원으로 나눈다. 
 ```
-function DetectionRed(drone, cam, step)
+img = snapshot(cam);
+image1R = img(:,:,1);
+image1G = img(:,:,2);
+image1B = img(:,:,3);
 ```
 
 그 다음 Red의 탐지를 용이하게 하기 위해 G차원과, B차원의 값을 절반으로 감소시킨다. 거리에 따른 정량적 분석을 통해 임계값을 조정하였다.  Red의 경우, step1, step4에서 동일하게 사용되므로 step1의 임계값과 step4의 임계값의 범위 사이의 값으로 설정하였다. 
