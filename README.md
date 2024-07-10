@@ -329,7 +329,7 @@ if abs(offsetY) < threshold && abs(offsetY) > threshold - abs(offsetY)
 쉽게 설명하자면, moveX 또는 moveY 값이 threshold / 2보다 큰 경우, 중점을 정확히 맞출 수는 없지만, 0.2m를 이동함으로써 이동하지 않은 것보다 더 중점에 가까운 결과를 얻을 수 있다. 
 이러한 접근 방식은 드론의 이동을 보다 정밀하게 조정하여 목표 지점에 더욱 가까워지도록 할 수 있다. 
 ```
-if abs(offsetX) < threshold - abs(offsetX)
+if abs(offsetX) < threshold - abs(offsetX) && abs(offsetY) < threshold - abs(offsetY) 
     centerfind = true;
     return;
 ```
@@ -539,7 +539,9 @@ image1B = img(:,:,3);
 scaling_factor=1.1;
 purple = (R > G) & (B > R) & (B > scaling_factor*G);
 ```
+
 다만 보라색의 경우, 그림자가 탐지되는 경우가 많이 발생하였다. 이에 작은 객체를 제거하여 오차의 가능성을 최대한 제거하였다.
+
 ```purple = bwareaopen(purple, 200);```
  
 다음으로 거리에 따른 RGB픽셀의 총합을 데이터셋으로 만들어, 비선형 회귀분석을 실시하여 G픽셀의 총합(x축)과 거리(y축)의 그래프와 수식을 도출하였다. 
@@ -563,7 +565,7 @@ end
 
 위의 알고리즘을 바탕으로 구동되는 main 함수이다.
 
--step1
+- #### step1
 
 calculateOffset함수를 사용하여 offset들과 원의 직경을 반환받는다. 이후 movedrone를 사용하여 직경을 받아 step 별 회귀분석식으로 구한 scale을 통해 얻은 임계값과 offset들을 비교하여 드론의 수직 수평운동을 결정한다.
 
@@ -590,7 +592,7 @@ step = step + 1;
 
 ```
 
--step2
+- #### step2
 
 step1 이후 드론의 위치가 너무 낮아졌을 수 있으므로 0.3m 상승시킨다. 
 일정 거리 전진 후, 반시계 방향으로 20도 회전한 상태에서 findbestangle을 실행하여 step에 따른 최적의 각도를 도출한다. 
@@ -629,7 +631,7 @@ DetectionGreen(drone,cam);
 
 step = step + 1;
 ```
--step3
+- #### step3
 
  step2 이후 바로 findbestangle을 실행하여 step에 따른 최적의 각도를 도출한다. 
  일정 거리 전진 후, calculateOffset과 movedrone함수를 사용하여 드론의 중점을 링의 중심에 맞춘다. 
@@ -656,7 +658,7 @@ DetectionPurple(drone,cam);
 step = step + 1;
 ```
 
--step4
+- #### step4
  일정 거리 전진 후, 시계 방향으로 20도 회전한 상태에서 findbestangle을 실행하여 step에 따른 최적의 각도를 도출한다. 이후 calculateOffset과 movedrone함수를 사용하여 드론의 중점을 링의 중심에 맞춘다.
  
  0.3m 전진 후, 다시 한 번 calculateOffset과 movedrone함수를 사용하여 드론의 중점을 링의 중심에 맞춘다. DetectionRed의 step4일 때의의 움직임을 수행하여 색상판과 드론과의 거리가 0.75m 될 때까지 이동한다. 
@@ -688,6 +690,7 @@ movedrone(drone, offsetX, offsetY, length, step);
 DetectionRed(drone,cam,step);
 ```
 ---
+
 ## 설계 시 마주한 문제점 및 해결방법
 
 1. [문제점]
