@@ -349,7 +349,7 @@ function bestAngle = findbestangle(drone, cam, step)
         case 3
             angles = -120:-5:-140; 
         case 4
-            angles = 240:-10:190; 
+            angles = 200:7.5:230; 
     end
 
     diameters = zeros(1, length(angles));
