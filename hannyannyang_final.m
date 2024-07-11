@@ -8,7 +8,7 @@ cam = camera(drone);
 
 % 드론 이륙
 takeoff(drone);
-moveup(drone,'distance',0.3,'Speed',1);
+moveup(drone,'distance',0.3,'Speed',0.5);
 
 step = 1;
 
@@ -18,17 +18,17 @@ length = diameters;
 
 % 중심점과의 거리를 구했다면 그만큼 드론을 이동시키는 함수
 movedrone(drone, offsetX, offsetY, length, step);
-
+   
 % 카메라와 도형이 중심을 맞췄다면 드론 직진
-moveforward(drone,'distance',2.2,'Speed',1);
+moveforward(drone,'distance',2.2,'Speed',0.8);
 
 % 빨간색을 마주하면 130도 회전하는 코드
 DetectionRed(drone,cam,step);
 
-%step2
+% step2
 step = step + 1;
 
-moveup(drone,'distance',0.3,'Speed',1);
+moveup(drone,'distance',0.3,'Speed',0.8);
 
 moveforward(drone,'distance',3,'Speed',0.8);
 
@@ -58,12 +58,12 @@ DetectionGreen(drone,cam);
 %step3
 step = step + 1;
 
-moveup(drone,'distance',0.3,'Speed',1);
+moveup(drone,'distance',0.3,'Speed',0.8);
 
 % -120~-140도 중 최적의 각도 검색
 findbestangle(drone,cam,step);
 
-moveforward(drone,'distance',0.5,'Speed',1);
+moveforward(drone,'distance',0.5,'Speed',0.8);
 
 while 1
     % 중심점과 이동해야 할 거리를 계산하는 함수
@@ -80,7 +80,7 @@ while 1
     end   
 end
 
-moveforward(drone,'distance',1,'Speed',1);
+moveforward(drone,'distance',1,'Speed',0.8);
 
 DetectionPurple(drone,cam);
 
@@ -89,13 +89,21 @@ step = step + 1;
 
 moveforward(drone,'distance',1,'Speed',0.7);
 
-moveup(drone,'distance',0.3,'Speed',1);
+moveup(drone,'distance',0.3,'Speed',0.8);
 
 turn(drone,deg2rad(-15));
 
 findbestangle(drone,cam,step);
 
+count = 0;
+
 while 1
+
+    if count > 3
+        moveback(drone,'Distance',0.3);
+        count = 0;
+    end
+
     % 중심점과 이동해야 할 거리를 계산하는 함수
     [offsetX, offsetY,  diameters] = calculateOffset(drone, cam);
     length = diameters; 
@@ -108,7 +116,11 @@ while 1
     else 
         disp('not find center!');
     end   
+    count = count + 1;
+
 end
+
+count = 0;
 
 moveforward(drone,'distance',1,'Speed',0.5);
 
@@ -120,7 +132,7 @@ function bestAngle = findbestangle(drone, cam, step)
         case 2 
             angles = 110:10:150;
         case 3
-            angles = -120:-5:-140; 
+            angles = -110:-10:-150; 
         case 4
             angles = 200:7.5:230;
     end
@@ -212,21 +224,21 @@ else
 if abs(offsetX) < threshold && abs(offsetX) > threshold - abs(offsetX) 
     if moveX < 0 
         disp("move left small");
-        moveleft(drone,'distance', 0.2,'Speed',1); % 왼쪽으로 이동
+        moveleft(drone,'distance', 0.2,'Speed',0.5); % 왼쪽으로 이동
     elseif moveX > 0
         disp("move right small");
-        moveright(drone,'distance', 0.2,'Speed',1); % 오른쪽으로 이동
+        moveright(drone,'distance', 0.2,'Speed',0.5); % 오른쪽으로 이동
     end
        
 elseif abs(offsetX) > threshold
     if moveX < 0
         disp("move left");
         disp(moveX);
-        moveleft(drone,'distance', -moveX,'Speed',1); % 왼쪽으로 이동
+        moveleft(drone,'distance', -moveX,'Speed',0.5); % 왼쪽으로 이동
     elseif moveX > 0 
         disp("move right");
         disp(moveX);
-        moveright(drone,'distance', moveX,'Speed',1); % 오른쪽으로 이동
+        moveright(drone,'distance', moveX,'Speed',0.5); % 오른쪽으로 이동
     end
 end
     
@@ -234,20 +246,20 @@ end
 if abs(offsetY) < threshold && abs(offsetY) > threshold - abs(offsetY)
      if moveY > 0
         disp("move up small");
-        moveup(drone,'distance', 0.2,'Speed',1); % 위로 이동
+        moveup(drone,'distance', 0.2,'Speed',0.5); % 위로 이동
      elseif moveY < 0
         disp("move down small");
-        movedown(drone,'distance', 0.2,'Speed',1); % 아래로 이동
+        movedown(drone,'distance', 0.2,'Speed',0.5); % 아래로 이동
      end
 elseif abs(offsetY) > threshold
     if moveY > 0
         disp("move up");
         disp(moveY);
-        moveup(drone,'distance', moveY,'Speed',1); % 위로 이동
+        moveup(drone,'distance', moveY,'Speed',0.5); % 위로 이동
     elseif moveY < 0
         disp("move down");
         disp(moveY);
-        movedown(drone,'distance', -moveY,'Speed',1); % 아래로 이동
+        movedown(drone,'distance', -moveY,'Speed',0.5); % 아래로 이동
     end
 end
 end
@@ -314,22 +326,22 @@ while true
             else
                  if bbox(4) > imgHeight * 0.9
                      disp('move back');
-                    moveback(drone, 'Distance',0.3,'Speed',1);
+                    moveback(drone, 'Distance',0.3,'Speed',0.5);
                  else
                      if bbox(1) > 1 && (bbox(1) + bbox(3) >= imgWidth)
                         disp("move right");
                         moveright(drone, 'Distance',0.2,'Speed',1);
                     elseif bbox(1) < 1 && (bbox(1) + bbox(3) < imgWidth)
                         disp("move left");
-                        moveleft(drone, 'Distance',0.2,'Speed',1);
+                        moveleft(drone, 'Distance',0.2,'Speed',0.5);
                      end
 
                      if bbox(2) > 1 && (bbox(2) + bbox(4) >= imgHeight)
                         disp("move down");
-                        movedown(drone, "Distance",0.2,'Speed',1);
+                        movedown(drone, "Distance",0.2,'Speed',0.5);
                      elseif bbox(2) < 1 && (bbox(2) + bbox(4) < imgHeight)
                         disp("move up");
-                        moveup(drone, "Distance",0.2,'Speed',1);
+                        moveup(drone, "Distance",0.2,'Speed',0.5);
                      end
                      count = count + 1; % 드론 이동 횟수
                  end
@@ -387,14 +399,14 @@ distance = exp(-0.471769 * log(sum(green(:))) + log(64.104421));
 
 disp(['distance: ', num2str(distance)]);
 
-if  distance < 1.2 || sum(green(:)) == 0
-    turn(drone,deg2rad(-120));
+if  distance < 1.4 || sum(green(:)) == 0
+    turn(drone,deg2rad(-110));
     return;
 end
 
-moveforward(drone,'Distance', distance - 1.1, 'Speed', 0.7);  
+moveforward(drone,'Distance', distance - 1.2, 'Speed', 0.7);  
  
-turn(drone,deg2rad(-120));
+turn(drone,deg2rad(-110));
 
 end
 
@@ -442,18 +454,18 @@ switch step
         return;
     end
 
-moveforward(drone,'Distance', distance - 0.6, 'Speed', 1);
+moveforward(drone,'Distance', distance - 0.6, 'Speed', 0.7);
 
 turn(drone,deg2rad(130));
 
     case 4
 
-if  distance < 0.9 || sum(red(:)) == 0
+if  distance < 0.85 || sum(red(:)) == 0
     land(drone);
     return;
 end
 
-moveforward(drone,'Distance', distance - 0.75, 'Speed', 1);
+moveforward(drone,'Distance', distance - 0.65, 'Speed', 0.7);
 land(drone);
 
 end
